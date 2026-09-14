@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ellie · AI Voice Receptionist</title>
+  <meta name="description" content="Ellie is an AI voice receptionist that books, reschedules and cancels HVAC appointments. Built with Vapi, n8n, Google Calendar and Airtable. Try the live demo in your browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%23ff5a1f'/><circle cx='50' cy='50' r='22' fill='%232f6bff'/></svg>">
+</head>
+<body>
+  <a class="skip" href="#demo">Skip to live demo</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Ellie home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Ellie</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#how">How it works</a>
+        <a href="#demo">Live demo</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#brain">Agent prompt</a>
+        <a href="#algorithm">Slot engine</a>
+      </nav>
+      <a class="btn btn-ink btn-sm" href="#demo" data-start-call>Call Ellie</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="dot-live"></span> Voice AI receptionist · Vapi × n8n</p>
+          <h1>The receptionist who <em>never</em> puts you on hold.</h1>
+          <p class="lede">Meet Ellie, the phone receptionist for <strong>Harrison Climate Solutions</strong>, an HVAC company in San Antonio. She checks the calendar, books, reschedules and cancels appointments while the caller is still on the line. Every call gets logged with a transcript, a summary and its cost.</p>
+          <div class="hero-cta">
+            <a class="btn btn-heat" href="#demo" data-start-call>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>
+              Talk to Ellie now
+            </a>
+            <a class="btn btn-ghost" href="#architecture">See the architecture</a>
+          </div>
+          <ul class="stack" aria-label="Tech stack">
+            <li>Vapi</li><li>n8n</li><li>Google Calendar</li><li>Airtable</li><li>Web Speech API</li>
+          </ul>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="call-card">
+            <div class="call-card-top">
+              <div>
+                <div class="cc-label">Incoming call</div>
+                <div class="cc-num">+1 (210) 555-0147</div>
+              </div>
+              <div class="cc-timer">00:42</div>
+            </div>
+            <div class="wave">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="cc-bubbles">
+              <p class="b b-user">My AC's blowing warm air. Can someone come out tomorrow at 3?</p>
+              <p class="b b-tool"><code>GetSlots</code> → 3pm busy · 3 open slots found</p>
+              <p class="b b-ai">Umm, 3 is taken. I've got 1, 1:30 or 4 PM tomorrow. Any of those work?</p>
+              <p class="b b-tool ok"><code>BookSlot</code> → confirmed · Meet link sent</p>
+            </div>
+          </div>
+          <div class="float-chip chip-cal"><span class="ico ico-gcal"></span> Event created</div>
+          <div class="float-chip chip-air"><span class="ico ico-air"></span> Row logged</div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <dl class="stats">
+          <div><dt>Voice tools</dt><dd>4</dd></div>
+          <div><dt>n8n webhooks</dt><dd>5</dd></div>
+          <div><dt>Workflow nodes</dt><dd>55</dd></div>
+          <div><dt>Hold time</dt><dd>0s</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- HOW -->
+    <section class="section" id="how">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">01 · How a call works</p>
+          <h2>From "hello" to a booked appointment in one conversation.</h2>
+        </header>
+        <ol class="steps">
+          <li class="step">
+            <span class="step-n">1</span>
+            <h3>Caller speaks</h3>
+            <p>Vapi answers the phone. It turns speech into text, runs the LLM with Ellie's system prompt, and speaks the reply back.</p>
+          </li>
+          <li class="step">
+            <span class="step-n">2</span>
+            <h3>Ellie picks a tool</h3>
+            <p>Once she has a name, a spelled-out email and a time, she calls <code>GetSlots</code>, <code>BookSlot</code>, <code>UpdateSlots</code> or <code>CancelSlots</code>.</p>
+          </li>
+          <li class="step">
+            <span class="step-n">3</span>
+            <h3>n8n does the work</h3>
+            <p>Each tool is a webhook. The workflow checks Google Calendar for conflicts, creates, moves or deletes the event, and writes the change to Airtable.</p>
+          </li>
+          <li class="step">
+            <span class="step-n">4</span>
+            <h3>Result comes back</h3>
+            <p>n8n replies with <code>{"results":[{"toolCallId","result"}]}</code>, and Ellie reads the result to the caller.</p>
+          </li>
+          <li class="step step-wide">
+            <span class="step-n">↺</span>
+            <h3>After hang-up</h3>
+            <p>Vapi posts an <code>end-of-call-report</code> to <code>/callresults</code>. It includes the transcript, recording, AI summary and cost, and all of it is upserted into Airtable's <em>Call Recording</em> table.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section class="console" id="demo" aria-labelledby="demo-title">
+      <div class="wrap">
+        <header class="console-head">
+          <div>
+            <p class="kicker kicker-dark">02 · Live demo</p>
+            <h2 id="demo-title">Call Ellie. Watch the backend react.</h2>
+            <p class="console-sub">Type or talk to her (mic works in Chrome and Edge). Each tool call runs a node-by-node copy of the n8n workflow against a simulated calendar and Airtable base. Everything stays in your browser.</p>
+          </div>
+          <div class="scenarios" role="group" aria-label="Scripted demo calls">
+            <span class="scen-label">Autoplay a call:</span>
+            <button class="scen" data-scenario="book">Book (with conflict)</button>
+            <button class="scen" data-scenario="reschedule">Reschedule</button>
+            <button class="scen" data-scenario="cancel">Cancel</button>
+            <button class="scen" data-scenario="emergency">Emergency transfer</button>
+          </div>
+        </header>
+
+        <div class="console-grid">
+          <!-- Phone -->
+          <article class="panel phone" aria-label="Phone call with Ellie">
+            <div class="phone-top">
+              <div class="caller">
+                <span class="muted-xs">Calling from</span>
+                <span id="callerNumber" class="mono">+1 (210) 555-0000</span>
+              </div>
+              <div class="call-meta">
+                <span class="pill" id="callStatus" data-state="idle">Ready</span>
+                <span class="mono muted-xs" id="callTimer">00:00</span>
+              </div>
+            </div>
+
+            <div class="orb-wrap">
+              <div class="orb" id="orb" data-state="idle"><span></span><span></span><span></span></div>
+              <div class="orb-text">
+                <strong>Ellie</strong>
+                <span id="orbLabel">Harrison Climate Solutions</span>
+              </div>
+            </div>
+
+            <ol class="transcript" id="transcript" aria-live="polite">
+              <li class="empty-state">
+                <p>Press <strong>Start call</strong> and say something like<br><em>"My AC is blowing warm air, can someone come out tomorrow at 3?"</em></p>
+              </li>
+            </ol>
+
+            <div class="suggestions" id="suggestions" aria-label="Suggested replies"></div>
+
+            <form class="composer" id="composer" autocomplete="off">
+              <button type="button" class="icon-btn" id="micBtn" aria-label="Hold to talk" title="Speak (Chrome / Edge)" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></svg>
+              </button>
+              <input id="msgInput" type="text" placeholder="Start a call to talk to Ellie…" aria-label="Message Ellie" disabled>
+              <button type="submit" class="icon-btn icon-send" id="sendBtn" aria-label="Send" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg>
+              </button>
+            </form>
+
+            <div class="phone-actions">
+              <button class="btn btn-call" id="callBtn" data-active="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>
+                <span>Start call</span>
+              </button>
+              <label class="toggle"><input type="checkbox" id="voiceToggle" checked> <span>Ellie's voice</span></label>
+              <label class="toggle" id="handsFreeWrap"><input type="checkbox" id="handsFree"> <span>Hands-free</span></label>
+            </div>
+            <p class="stt-note" id="sttNote" hidden>Voice input isn't supported in this browser, so type your replies instead. Ellie's voice still works.</p>
+          </article>
+
+          <!-- n8n execution -->
+          <article class="panel exec" aria-label="n8n execution trace">
+            <div class="exec-head">
+              <div>
+                <span class="muted-xs">n8n execution</span>
+                <h3 id="execWorkflow">Waiting for a tool call</h3>
+                <code class="exec-path" id="execPath">POST /webhook/…</code>
+              </div>
+              <span class="pill" id="execStatus" data-state="idle">Idle</span>
+            </div>
+            <ol class="exec-steps" id="execSteps">
+              <li class="exec-empty">When Ellie calls a tool, each n8n node lights up here in order, including the branch the <em>If</em> nodes take.</li>
+            </ol>
+            <div class="payload">
+              <div class="tabs" role="tablist">
+                <button role="tab" class="tab" aria-selected="true" data-tab="request">Vapi → n8n</button>
+                <button role="tab" class="tab" aria-selected="false" data-tab="response">n8n → Vapi</button>
+                <button class="copy" id="copyPayload" type="button">Copy</button>
+              </div>
+              <pre class="code" id="execPayload" tabindex="0">{ }</pre>
+            </div>
+            <div class="history">
+              <h4>Executions</h4>
+              <ul id="execHistory"><li class="muted-xs">None yet</li></ul>
+            </div>
+          </article>
+        </div>
+
+        <!-- Backend state -->
+        <article class="panel backend" aria-label="Backend data">
+          <div class="backend-head">
+            <div class="tabs" role="tablist">
+              <button role="tab" class="tab" aria-selected="true" data-view="calendar"><span class="ico ico-gcal"></span>Google Calendar</button>
+              <button role="tab" class="tab" aria-selected="false" data-view="appointments"><span class="ico ico-air"></span>Airtable · Appointments <b class="count" id="countAppointments">0</b></button>
+              <button role="tab" class="tab" aria-selected="false" data-view="calls"><span class="ico ico-air"></span>Airtable · Call Recording <b class="count" id="countCalls">0</b></button>
+            </div>
+            <button class="btn btn-ghost-dark btn-sm" id="resetData" type="button">Reset demo data</button>
+          </div>
+          <div class="view" id="viewCalendar"></div>
+          <div class="view" id="viewAppointments" hidden></div>
+          <div class="view" id="viewCalls" hidden></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section class="section" id="architecture">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">03 · Architecture</p>
+          <h2>One voice agent, five webhooks, two sources of truth.</h2>
+          <p class="section-sub">Vapi handles the conversation and n8n handles everything else. Google Calendar decides whether a time is free, and Airtable keeps the history of every booking and call.</p>
+        </header>
+
+        <div class="arch">
+          <div class="arch-node arch-caller">
+            <span class="arch-ico">☎</span>
+            <h3>Caller</h3>
+            <p>Phone call (PSTN)</p>
+          </div>
+          <div class="arch-link"><span>voice</span></div>
+          <div class="arch-node arch-vapi">
+            <span class="arch-ico">◉</span>
+            <h3>Vapi · Ellie</h3>
+            <p>Speech-to-text → LLM + system prompt → text-to-speech</p>
+            <ul class="arch-tools"><li>GetSlots</li><li>BookSlot</li><li>UpdateSlots</li><li>CancelSlots</li><li>TransferCall</li></ul>
+          </div>
+          <div class="arch-link"><span>tool calls · HTTPS</span></div>
+          <div class="arch-node arch-n8n">
+            <span class="arch-ico">⌁</span>
+            <h3>n8n workflow</h3>
+            <p>5 webhook triggers · 55 nodes</p>
+            <ul class="arch-tools mono"><li>/getslots</li><li>/bookslots</li><li>/updateslots</li><li>/cancelslots</li><li>/callresults</li></ul>
+          </div>
+          <div class="arch-split">
+            <div class="arch-node arch-gcal"><span class="ico ico-gcal"></span><h3>Google Calendar</h3><p>freeBusy · list · insert · patch · delete, with Google Meet links</p></div>
+            <div class="arch-node arch-air"><span class="ico ico-air"></span><h3>Airtable</h3><p><b>Appointments</b> table and <b>Call Recording</b> table</p></div>
+          </div>
+        </div>
+
+        <h3 class="sub-h">The five workflows, node by node</h3>
+        <p class="section-sub">Each lane below uses the node names from the exported n8n JSON. Colored dots show the node type, and forks show where an <em>If</em> or an error output splits the path.</p>
+        <div class="legend" id="nodeLegend"></div>
+        <div class="flows" id="workflowMap"></div>
+      </div>
+    </section>
+
+    <!-- BRAIN -->
+    <section class="section section-alt" id="brain">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">04 · The agent prompt</p>
+          <h2>Personality up front, strict rules underneath.</h2>
+        </header>
+        <div class="brain-grid">
+          <div class="brain-card">
+            <h3>Identity & style</h3>
+            <blockquote>"Hi, this is Ellie with Harrison Climate Solutions. How can I help you?"</blockquote>
+            <ul class="ticks">
+              <li>Friendly and conversational, with a little Texan warmth and humor</li>
+              <li>Uses natural fillers like "Umm…" and "Well…", and keeps answers short</li>
+              <li>Steers off-topic questions back to HVAC services and scheduling</li>
+              <li>Reads times naturally ("Three thirty PM") and phone numbers digit by digit</li>
+            </ul>
+          </div>
+          <div class="brain-card">
+            <h3>Hard rules</h3>
+            <ul class="ticks ticks-warn">
+              <li>Doesn't move forward until she has a correct <b>name</b>, <b>email</b> and <b>time</b></li>
+              <li>Always says "Can you spell your email please?"</li>
+              <li>Defaults to a 30-minute appointment when no end time is given</li>
+              <li>Never books weekends, holidays or times in the past (with a joke about time travel)</li>
+              <li>Always calls <code>GetSlots</code> before booking and only offers times it returns, 2–3 at a time</li>
+              <li>Before cancelling, offers to reschedule instead</li>
+              <li>Transfers to Sam right away for emergencies or the secret phrase "Hot Brisket"</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="tools-table">
+            <thead><tr><th>Tool</th><th>Webhook</th><th>Arguments from Vapi</th><th>What n8n does</th></tr></thead>
+            <tbody>
+              <tr><td><span class="tag tag-cool">GetSlots</span></td><td class="mono">/getslots</td><td class="mono">starttime, endtime</td><td>Runs a freeBusy check. If the time is taken, it lists the next week of events and works out open 30-minute start times per weekday.</td></tr>
+              <tr><td><span class="tag tag-ok">BookSlot</span></td><td class="mono">/bookslots</td><td class="mono">name, email, starttime, endtime, notes, Title</td><td>Validates the email, converts to CST, creates the Calendar event with a Meet link, logs it to Airtable, and returns a friendly message if the slot was taken.</td></tr>
+              <tr><td><span class="tag tag-violet">UpdateSlots</span></td><td class="mono">/updateslots</td><td class="mono">name, email, starttime, endtime, Rescheduled_starttime, Rescheduled_endttime</td><td>Looks up the booking in Airtable by the caller's phone number, updates the Calendar event, and sets the status to "Updated/Rescheduled".</td></tr>
+              <tr><td><span class="tag tag-err">CancelSlots</span></td><td class="mono">/cancelslots</td><td class="mono">name, email, starttime, Cancelnotes</td><td>Looks up the booking by phone number, deletes the event (attendees get notified), and sets the status to "Canceled".</td></tr>
+              <tr><td><span class="tag tag-heat">Server webhook</span></td><td class="mono">/callresults</td><td class="mono">end-of-call-report</td><td>Upserts the transcript, recording URL, summary, cost and start/end times into the Call Recording table.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALGORITHM -->
+    <section class="section" id="algorithm">
+      <div class="wrap algo-grid">
+        <div>
+          <p class="kicker">05 · Slot engine</p>
+          <h2>How Ellie finds "I've got 1, 1:30 or 4."</h2>
+          <p class="section-sub">If the requested time is busy, the <em>Available Start Times &amp; Ranges</em> Code node takes the sorted week of events and, for each weekday:</p>
+          <ol class="algo-steps">
+            <li>Starts at the beginning of the workday in <code>America/Chicago</code></li>
+            <li>Walks through the events and keeps every gap between them</li>
+            <li>Splits each gap into 30-minute start times</li>
+            <li>Marks 3 or more back-to-back slots as a <b>wide open range</b></li>
+            <li>Skips Saturdays and Sundays, then formats everything as text for the LLM</li>
+          </ol>
+          <p class="muted-sm">The timeline shows the engine running on the demo calendar right now, so it updates when you book something.</p>
+        </div>
+        <div class="algo-vis">
+          <div class="algo-head">
+            <strong id="algoDay">—</strong>
+            <span class="muted-xs">8 AM – 5 PM CT</span>
+          </div>
+          <div class="algo-track" id="algoTrack"></div>
+          <div class="algo-legend">
+            <span><i class="sw sw-busy"></i>Busy</span>
+            <span><i class="sw sw-free"></i>Open 30-min start</span>
+            <span><i class="sw sw-wide"></i>Wide open range</span>
+          </div>
+          <pre class="code code-light" id="algoOutput"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>Ellie</span></div>
+      <p>Built by Daksh Tyagi with Vapi, n8n, Google Calendar and Airtable. This demo runs entirely in your browser. No real calls, calendars or Airtable bases are touched.</p>
+      <a href="#top" class="muted-sm">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="js/time.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/n8n.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/agent.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
