@@ -10,7 +10,7 @@ recreation of the n8n workflow, the Vapi tool contract, and Ellie's conversation
 logic — so the whole project can be explored, demoed and read end-to-end without
 a live phone line, a running n8n instance, or real Google/Airtable credentials.
 
-**[Live demo](#)** · built by [Daksh Tyagi](https://github.com/InnoxCodes)
+**[Live demo](https://ellie-voice-receptionist.vercel.app)** · built by [Daksh Tyagi](https://github.com/InnoxCodes)
 
 ## What it does
 
